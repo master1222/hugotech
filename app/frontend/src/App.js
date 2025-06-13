@@ -282,9 +282,9 @@ export function App() {
             <Container>
               <Group justify="space-between" style={{ height: '10px', width: '100%' }}>
                 <Group justify="flex-start">
-                  <Image h={100} w="auto" fit="contain" src={logo}></Image>
+                  <Image h="60%" w="auto" fit="contain" src={logo}></Image>
                   <h2 style={{ marginLeft: '10px', color: '#e09f07' }} href="https://google.sk">{t("home")}</h2>
-                </Group>
+                </Group>  
                 <Group justify='flex-end'>
                   <Button variant="subtle" color="yellow">Zvukové stopy</Button>
                   <form method="post" action="/accounts/logout/">
