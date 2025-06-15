@@ -54,8 +54,7 @@ INSTALLED_APPS = [
     'rest_framework',  # Django REST framework for API support
     'frontend',  # Frontend app for serving React files
     #'django.contrib.sites',  # Uncomment if using sites framework
-    'corsheaders',  # For handling CORS
-    'django_filters',
+    'corsheaders',  # For handling CORSs
 ]
 
 MIDDLEWARE = [
