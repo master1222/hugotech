@@ -1,0 +1,10 @@
+services: 
+  server:
+    image: bell_scheduler
+    ports:
+      - '8000:8000'
+    entrypoint: [
+      "bin/bash",
+      "-c",
+      "source activate bell_scheduler && python manage.py runserver",
+    ]

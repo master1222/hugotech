@@ -7,7 +7,6 @@ dependencies:
   - djangorestframework=3.16.*
   - nodejs=22.13.*
   - django-cors-headers=4.7.*
-  - django-cors-headers=4.7.*
   - pip=25.1
   - pip: 
     - python-vlc==3.0.*

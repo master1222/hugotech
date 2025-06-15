@@ -2,16 +2,17 @@ FROM continuumio/miniconda3:latest
 
 COPY enviroment.yml /tmp/enviroment.yml
 
-# RUN conda env create -f /tmp/enviroment.yml && \
-#     conda clean -yfa && \
-#     find /opt/conda/envs -follow -type f -name '*.a' -delete && \
-#     find /opt/conda/envs -follow -type f -name '*.pyc' -delete && \
-#     find /opt/conda/envs -follow -type f -name '*.js.map' -delete
+RUN conda env create -f /tmp/enviroment.yml && \
+    conda clean -yfa && \
+    find /opt/conda/envs -follow -type f -name '*.a' -delete && \
+    find /opt/conda/envs -follow -type f -name '*.pyc' -delete && \
+    find /opt/conda/envs -follow -type f -name '*.js.map' -delete
 
 COPY app /app/
 
-# WORKDIR /app/
-# RUN conda run -n bell_scheduler npm --prefix ./frontend install 
-# RUN conda run -n bell_scheduler npm --prefix ./frontend run build  
+WORKDIR /app/
+RUN conda run -n bell_scheduler npm --prefix ./frontend install 
+RUN conda run -n bell_scheduler npm --prefix ./frontend run build  
 
-# RUN conda run -n bell_scheduler python manage.py collectstatic --noinput
+RUN conda run -n bell_scheduler python manage.py collectstatic --noinput
+RUN conda run -n bell_scheduler python manage.py migrate

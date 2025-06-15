@@ -154,6 +154,6 @@ LOGIN_REDIRECT_URL =  '/'
 MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_URL = '/media/'
 
-REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
-}
+#REST_FRAMEWORK = {
+#    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+#}
