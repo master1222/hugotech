@@ -9,19 +9,13 @@ import { TimeInput } from '@mantine/dates';
 import { DataTable } from 'mantine-datatable';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { IconPlus, IconTrash} from '@tabler/icons-react';
+import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from "react-i18next";
 import logo from "./LOGO.png"
-
-
-
-
+import TrackModal from './modules/TrackModal';
+import { notifications } from '@mantine/notifications';
 
 export function App() {
-
-  if (useState === undefined) {
-    throw new Error('React.useState is not defined. Please ensure you are using a compatible version of React.');
-  }
 
   const [lessons, setLessons] = useState([]);
   const [tracks, setTracks] = useState([]);
@@ -38,22 +32,13 @@ export function App() {
   const [editModal, setEditModal] = useState(true);
   var CSRF_TOKEN = '';
   const { i18n, t } = useTranslation();
+  const [openedTrackModal, setOpenedTrackModal] = useState(false);
 
 
   useEffect(() => {
     fetchLessons();
     fetchTracks();
     fetchLibraries();
-    return () => {
-      // Cleanup function if needed
-      setLessons([]);
-      setTracks([]);
-      setLibraries([]);
-      setOpenedModal(false);
-      setSelectedLesson(null);
-      setChecked(false);
-      setTime('');
-    }
   }, []);
 
   const fetchLessons = async () => {
@@ -62,6 +47,11 @@ export function App() {
       setLessons(await response.data);
     } catch (error) {
       console.error('Error fetching lessons:', error);
+      notifications.show({
+        //message: 'Problém pri načítaní dát: Plánované hodiny',
+        message: t("err_read_lessons"),
+        color: 'red'
+      })
     }
   };
 
@@ -71,6 +61,11 @@ export function App() {
       setTracks(await response.data);
     } catch (error) {
       console.error('Error fetching tracks:', error);
+      notifications.show({
+        //message: 'Problém pri načítaní dát: Zvukové stopy',
+        message: t("err_read_tracks"),
+        color: 'red'
+      })
     }
   };
 
@@ -80,18 +75,27 @@ export function App() {
       setLibraries(await response.data);
     } catch (error) {
       console.error('Error fetching libraries:', error);
+      notifications.show({
+        //message: 'Problém pri načítaní dát: Knižnice',
+        message: t("err_read_libraries"),
+        color: 'red'
+      })
     }
   };
 
   const getTableColumns = () => {
-    return [{ accessor: 'time', title: 'Čas', textAlign: 'left' },
-    { accessor: 'track.name', title: 'Zvuková stopa', textAlign: 'left' },
+    return [{ accessor: 'time', title: t("time"), textAlign: 'left' },
+    { accessor: 'track.name', title: t("track"), textAlign: 'left', render: (item) => (
+      item.track.name + ' - ' + item.track.description
+    ) },
     {
-      accessor: 'bell', title: 'Zvonček', render: (item) => (
+      accessor: 'bell', title: t("bell"), render: (item) => (
         <Checkbox disabled checked={item.bell}></Checkbox>
       )
     },
-    { accessor: 'library.name', title: 'Knižnica', textAlign: 'left' }];
+    { accessor: 'library.name', title: t("library"), textAlign: 'left', render: (item) => (
+      item.library.name + ' - ' + item.library.description
+    ) }];
   };
 
   const getTableData = () => {
@@ -111,8 +115,8 @@ export function App() {
       <Modal
         opened={openedModal}
         onClose={close}
-        title='Detail hodiny'>
-        <TimeInput mt="md" radius="lg" label="Čas" placeholder="Input component" value={selectedLesson ? selectedLesson.time : null}
+        title={t("entry_detail")}>
+        <TimeInput mt="md" radius="lg" label={t("time")} placeholder="Input component" value={selectedLesson ? selectedLesson.time : null}
           onChange={(event) => {
             setTime(event.currentTarget.value);
             selectedLesson.time = event.currentTarget.value;
@@ -120,11 +124,11 @@ export function App() {
           }} />
         <Select
           allowDeselect={false}
-          label="Zvuková stopa"
+          label={t("track")}
           mt="md"
           radius="lg"
-          placeholder="Vyberte zvukovú stopu"
-          data={tracks.map(track => ({ value: track.id.toString(), label: track.name + ' ' + track.description }))}
+          placeholder={t("chose_track")}
+          data={tracks.map(track => ({ value: track.id.toString(), label: track.name + ' - ' + track.description }))}
           value={selectedTrack}
           onChange={(value) => {
             selectedLesson.track = tracks.find(track => track.id === Number(value));
@@ -132,10 +136,10 @@ export function App() {
             setSelectedTrack(value);
           }}
         />
-        <Checkbox label="Zvonček" mt="md" checked={checked}
+        <Checkbox label={t("bell")} mt="md" checked={checked}
           radius="lg"
           value={selectedLesson ? selectedLesson.bell : false}
-          description="Zvonček sa spustí na začiatku zvoleného času"
+          description={t("bell_description")}
           style={{ marginTop: '10px' }}
           onChange={(event) => {
             setChecked(
@@ -145,11 +149,11 @@ export function App() {
           }} />
         <Select
           allowDeselect={false}
-          label="Knižnica"
+          label={t("library")}
           mt="md"
           radius="lg"
-          placeholder="Vyberte knižnicu"
-          data={libraries.map(library => ({ value: library.id.toString(), label: library.name }))}
+          placeholder={t("chose_library")}
+          data={libraries.map(library => ({ value: library.id.toString(), label: library.name + ' - ' + library.description }))}
           value={selectedLibrary}
           onChange={(value) => {
             selectedLesson.library = libraries.find(lib => lib.id === Number(value));
@@ -159,7 +163,7 @@ export function App() {
         />
         <Group justify="center" mt="xl">
           {displayTrash()}
-          <Button variant="filled" color="yellow" radius="md" onClick={() => onSaveLesson(selectedLesson)}>Uložiť</Button>
+          <Button variant="filled" color="yellow" radius="md" onClick={() => onSaveLesson(selectedLesson)}>{t("save")}</Button>
         </Group>
       </Modal>
     )
@@ -168,8 +172,8 @@ export function App() {
   const displayTrash = () => {
     if (editModal) {
       return (
-        <Tooltip label="Vymazať záznam">
-          <ActionIcon variant="outline" color="red" aria-label="Settings" onClick={() => onDeleteLesson(selectedLesson)}>
+        <Tooltip label={t("delete_entry")}>
+          <ActionIcon variant="filled" color="red" aria-label="Settings" onClick={() => onDeleteLesson(selectedLesson)}>
             <IconTrash style={{ width: '70%', height: '70%' }} stroke={1.5} /></ActionIcon>
         </Tooltip>
       )
@@ -219,8 +223,17 @@ export function App() {
             console.log('Lesson updated successfully:', response.data);
             fetchLessons(); // Refresh the lessons after updating
             setOpenedModal(false);
+            notifications.show({
+              message: t("change_succ"),
+              color: 'green'
+            })
           })
           .catch(error => {
+            notifications.show({
+              title: t("error"),
+              message: t("change_err"),
+              color: 'green'
+            })
             console.error('Error updating lesson:', error);
           });
       } else {
@@ -236,9 +249,18 @@ export function App() {
             console.log('Lesson saved successfully:', response.data);
             fetchLessons(); // Refresh the lessons after saving
             setOpenedModal(false);
+            notifications.show({
+              message: t("create_succ"),
+              color: 'green'
+            })
           })
           .catch(error => {
             console.error('Error saving lesson:', error);
+            notifications.show({
+              title: t("error"),
+              message: t("create_err"),
+              color: 'red'
+            })
           });
       };
     }
@@ -258,9 +280,18 @@ export function App() {
           console.log('Lesson deleted successfully:', response.data);
           fetchLessons(); // Refresh the lessons after deleting
           setOpenedModal(false);
+          notifications.show({
+            message: t("delete_succ"),
+            color: 'green'
+          })
         })
         .catch(error => {
           console.error('Error deleting lesson:', error);
+          notifications.show({
+            title: t("error"),
+            message: t("delete_err"),
+            color: 'red'
+          })
         });
     }
   };
@@ -271,7 +302,6 @@ export function App() {
     fetchTracks();
   };
 
-
   return (
     <div className="App">
       <MantineProvider defaultColorScheme="dark">
@@ -279,17 +309,21 @@ export function App() {
           header={{ height: 60 }}
           padding="md">
           <AppShell.Header>
+            <div style={{ height: "10px" }}></div>
             <Container>
-              <Group justify="space-between" style={{ height: '10px', width: '100%' }}>
+              <Group justify="space-between" style={{ height: '15px', width: '100%' }}>
                 <Group justify="flex-start">
-                  <Image h="60%" w="auto" fit="contain" src={logo}></Image>
-                  <h2 style={{ marginLeft: '10px', color: '#e09f07' }} href="https://google.sk">{t("home")}</h2>
+                  <a href="https://www.hugotech.sk/">
+                    <Image h="80%" w="auto" fit="contain" src={logo} />
+                  </a>
                 </Group>
                 <Group justify='flex-end'>
-                  <Button variant="subtle" color="yellow">Zvukové stopy</Button>
+                  <Button variant="subtle" color="yellow" onClick={() => {
+                    setOpenedTrackModal(true)
+                  }}>{t("tracks_button")}</Button>
                   <form method="post" action="/accounts/logout/">
                     <input type="hidden" name="csrfmiddlewaretoken" value={getCookie("csrftoken")} />
-                    <Button type="submit" variant="subtle" color="yellow">Odhlásiť</Button>
+                    <Button type="submit" variant="subtle" color="yellow">{t("logout")}</Button>
                   </form>
                   <Select allowDeselect={false} value={selectedLanguage} data={languages}
                     onChange={(event) => onChangeLang(event)} />
@@ -300,7 +334,7 @@ export function App() {
           <AppShell.Main>
             <Container>
               <Group justify="flex-start">
-                <Tooltip label="Pridať záznam">
+                <Tooltip label={t("add_entry")}>
                   <ActionIcon variant="filled" color="yellow" aria-label="Settings" onClick={() => {
                     setSelectedLesson({ time: '', track: {}, bell: false, library: {} });
                     setChecked(false);
@@ -329,6 +363,7 @@ export function App() {
           </AppShell.Main>
         </AppShell>
         {renderModal()}
+        <TrackModal openedTrackModal={openedTrackModal} close={setOpenedTrackModal} tracks={tracks} lang={t} />
       </MantineProvider>
     </div>
   );

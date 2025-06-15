@@ -6,9 +6,9 @@ import os
 class Track(models.Model):
     ##id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=5, null=True)
-    language = models.CharField(max_length=2)
     description = models.CharField(max_length=150)
     media = models.FileField(null=True,upload_to="tracks")
+    bell = models.BooleanField()
     #file_path = models.FilePathField()
 
     def __str__(self):

@@ -5,7 +5,7 @@ from .models import Lesson, Track, Library, Song
 class TrackForNestingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Track
-        fields = ("id","name", "language", "description")
+        fields = ("id","name", "description")
 
 
 class LibraryForNestingSerializer(serializers.ModelSerializer):
@@ -61,7 +61,7 @@ class LessonSerializer(serializers.ModelSerializer):
 class TrackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Track
-        fields = ("id", "name", "language", "description", "media")
+        fields = ("id", "name", "description", "media")
 
 class LibrarySerializer(serializers.ModelSerializer):
     class Meta:

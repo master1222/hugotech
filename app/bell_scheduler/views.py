@@ -5,7 +5,7 @@ from bell_scheduler.models import Lesson, Track, Library, Song
 from bell_scheduler.serializers import LessonSerializer, TrackSerializer, LibrarySerializer, SongSerializer
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django_filters.rest_framework import DjangoFilterBackend
+#from django_filters.rest_framework import DjangoFilterBackend
 
 
 
@@ -31,9 +31,7 @@ class TrackProtectedViewSet(viewsets.ModelViewSet):
         return super().dispatch(*args, **kwargs)
 
     serializer_class = TrackSerializer  # Assuming you have a TrackSerializer
-    queryset = Track.objects.all()  # Assuming you have a Track model
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["language"]
+    queryset = Track.objects.filter(bell=False)  # Assuming you have a Track model
     
 
 

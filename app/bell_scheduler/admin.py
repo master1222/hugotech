@@ -10,7 +10,7 @@ class SongInline(admin.TabularInline):
 
 
 class TrackAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "language", "description", "media")
+    list_display = ("id", "name", "description", "media")
     inlines = [LessonInline]
 
 
