@@ -33,7 +33,13 @@ class Command(BaseCommand):
 
             while True:
 
-                bell_path = os.path.join(settings.MEDIA_ROOT,str(random.choice(models.Track.objects.filter(bell=True)).media))
+                bell_list = models.Track.objects.filter(bell=True)
+                if not bell_list:  
+                    bell_path = ""
+                else:
+                    bell_path = os.path.join(settings.MEDIA_ROOT,str(),random.choice(bell_list).media)
+                
+                
 
                 for obj in models.Lesson.objects.all():
                     dif = datetime.combine(date.today(),obj.time) - datetime.combine(date.today(),datetime.now().time())

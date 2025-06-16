@@ -1,10 +1,92 @@
-services: 
+volumes:
+  server_db:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "C:\\Users\\juraj\\Documents\\Workplace\\BellScheduler\\volumes\\db"
+  statics:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "C:\\Users\\juraj\\Documents\\Workplace\\BellScheduler\\volumes\\statics"
+  media:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "C:\\Users\\juraj\\Documents\\Workplace\\BellScheduler\\volumes\\media"
+
+services:
+  server-init:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    environment:
+      DJANGO_SUPERUSER_PASSWORD: "3$KDZm_*3W02"
+      DJANGO_SUPERUSER_USERNAME: "admin"
+      DJANGO_SUPERUSER_EMAIL: "random@noexist.xyz"
+    volumes:
+      - server_db:/app/db/
+      - statics:/app/static/
+      - media:/app/media/
+    entrypoint:
+      [
+        "/bin/bash",
+        "-c",
+        "source activate bell_scheduler && python manage.py migrate && python manage.py collectstatic --noinput && mkdir -p /app/media/libraries && mkdir -p /app/media/tracks",
+      ]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+
   server:
-    image: bell_scheduler
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    environment:
+      DJANGO_SUPERUSER_PASSWORD: "123tkacik456"
+      DJANGO_SUPERUSER_USERNAME: "admin"
+
+    volumes:
+      - server_db:/app/db/
     ports:
-      - '8000:8000'
-    entrypoint: [
-      "bin/bash",
-      "-c",
-      "source activate bell_scheduler && python manage.py runserver",
-    ]
+      - "8000:8000"
+    entrypoint:
+      [
+        "/bin/bash",
+        "-c",
+        "source activate bell_scheduler && granian app.asgi:application --host 0.0.0.0 --workers 4 --port 8000 --interface asgi",
+      ]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    depends_on:
+      server-init:
+        condition: service_completed_successfully
+    restart: always
+
+  play:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    entrypoint:
+      [
+        "/bin/bash",
+        "-c",
+        "source activate bell_scheduler && python manage.py play",
+      ]
+    volumes:
+      - server_db:/app/db/
+      - media:/app/media/
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    depends_on:
+      server-init:
+        condition: service_completed_successfully
+    restart: always
