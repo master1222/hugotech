@@ -26,11 +26,13 @@ SECRET_KEY = 'django-insecure-jy%((u+2inn0+$(fg151xoa43x)^tk0i-$_xcb!*a5*n!@p#0q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [ 'localhost' ]  # Allow requests from localhost
+ALLOWED_HOSTS = [ 'localhost', 'hugotech' ]  # Allow requests from localhost
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # React development server
     "http://localhost:8000",  # Django development server
+    "http://hugotech:8000",
+    "http://hugotech:80"
 ]
 
 #CSRF_COOKIE_NAME = "csrftoken"
@@ -38,6 +40,8 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",  # React development server
     "http://localhost:8000",  # Django development server
+    "http://hugotech:8000",
+    "http://hugotech:80"
 ]
  
 
@@ -88,7 +92,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'app.wsgi.application'
+##WSGI_APPLICATION = 'app.wsgi.application'
 
 
 # Database

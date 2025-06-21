@@ -9,6 +9,8 @@ dependencies:
   - django-cors-headers=4.7.*
   - whitenoise=6.7.*
   - granian=2.3.*
+  - cachetools=6.0.*
   - pip=25.1
   - pip: 
-    - python-vlc==3.0.*
+    - nava==0.7
+    - holidays==0.75

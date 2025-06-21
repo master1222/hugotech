@@ -4,19 +4,19 @@ volumes:
     driver_opts:
       type: "none"
       o: "bind"
-      device: "C:\\Users\\juraj\\Documents\\Workplace\\BellScheduler\\volumes\\db"
+      device: "/var/hugotech/db"
   statics:
     driver: local
     driver_opts:
       type: "none"
       o: "bind"
-      device: "C:\\Users\\juraj\\Documents\\Workplace\\BellScheduler\\volumes\\statics"
+      device: "/var/hugotech/statics"
   media:
     driver: local
     driver_opts:
       type: "none"
       o: "bind"
-      device: "C:\\Users\\juraj\\Documents\\Workplace\\BellScheduler\\volumes\\media"
+      device: "/var/hugotech/media"
 
 services:
   server-init:
@@ -24,7 +24,7 @@ services:
       context: ..
       dockerfile: deployment/Dockerfile
     environment:
-      DJANGO_SUPERUSER_PASSWORD: "3$KDZm_*3W02"
+      DJANGO_SUPERUSER_PASSWORD: "3$$KDZm_*3W02"
       DJANGO_SUPERUSER_USERNAME: "admin"
       DJANGO_SUPERUSER_EMAIL: "random@noexist.xyz"
     volumes:
@@ -35,7 +35,7 @@ services:
       [
         "/bin/bash",
         "-c",
-        "source activate bell_scheduler && python manage.py migrate && python manage.py collectstatic --noinput && mkdir -p /app/media/libraries && mkdir -p /app/media/tracks",
+        "source activate bell_scheduler && python manage.py migrate && python manage.py collectstatic --noinput",
       ]
     logging:
       driver: "json-file"
@@ -47,11 +47,15 @@ services:
       context: ..
       dockerfile: deployment/Dockerfile
     environment:
-      DJANGO_SUPERUSER_PASSWORD: "123tkacik456"
+      DJANGO_SUPERUSER_PASSWORD: "3$$KDZm_*3W02"
       DJANGO_SUPERUSER_USERNAME: "admin"
-
     volumes:
       - server_db:/app/db/
+      - media:/app/media/
+    devices:
+      - /dev/gpiochip0
+      - /dev/snd
+    privileged: true
     ports:
       - "8000:8000"
     entrypoint:
@@ -73,6 +77,9 @@ services:
     build:
       context: ..
       dockerfile: deployment/Dockerfile
+    environment:
+      PULSE_SERVER: unix:${XDG_RUNTIME_DIR}/pulse/native
+      TZ: "Europe/Bratislava"
     entrypoint:
       [
         "/bin/bash",
@@ -82,6 +89,12 @@ services:
     volumes:
       - server_db:/app/db/
       - media:/app/media/
+      - ${XDG_RUNTIME_DIR}/pulse/native:${XDG_RUNTIME_DIR}/pulse/native
+      - ~/.config/pulse/cookie:/root/.config/pulse/cookie  
+    devices:
+      - /dev/gpiochip0
+      - /dev/snd
+    privileged: true
     logging:
       driver: "json-file"
       options:

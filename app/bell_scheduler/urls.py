@@ -8,6 +8,7 @@ router.register(r"lessons", views.LessonProtectedViewSet, basename="lesson")
 router.register(r"tracks", views.TrackProtectedViewSet, basename="track")
 router.register(r"libraries", views.LibraryProtectedViewSet, basename="library")
 router.register(r"songs",views.SongProtectedViewSet, basename="song")
+router.register(r"config",views.SongProtectedViewSet, basename="config")
 
 urlpatterns = [
     path("api/v1/", include(router.urls)),      

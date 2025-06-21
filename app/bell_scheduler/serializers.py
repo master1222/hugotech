@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Lesson, Track, Library, Song
+from .models import Lesson, Track, Library, Song, Config
 
 
 class TrackForNestingSerializer(serializers.ModelSerializer):
@@ -72,3 +72,8 @@ class SongSerializer(serializers.ModelSerializer):
     class Meta:
         model = Song
         fields = ("id","library","media")
+
+class ConfigSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Config
+        fields = ("country","playWeekend","playHoliday","pin", "pinBeforeSeconds", "trackPlaySeconds", "bellPlaySeconds", "songPlaySeconds")

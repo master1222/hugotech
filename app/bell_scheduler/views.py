@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from bell_scheduler.models import Lesson, Track, Library, Song
-from bell_scheduler.serializers import LessonSerializer, TrackSerializer, LibrarySerializer, SongSerializer
+from bell_scheduler.models import Lesson, Track, Library, Song, Config
+from bell_scheduler.serializers import LessonSerializer, TrackSerializer, LibrarySerializer, SongSerializer, ConfigSerializer
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 #from django_filters.rest_framework import DjangoFilterBackend
@@ -54,3 +54,12 @@ class SongProtectedViewSet(viewsets.ModelViewSet):
 
     serializer_class = SongSerializer  # Assuming you have a LibrarySerializer
     queryset = Song.objects.all()  # Assuming you have a Library model
+
+class ConfigProtectedViewSet(viewsets.ModelViewSet):
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    serializer_class = ConfigSerializer  # Assuming you have a LibrarySerializer
+    queryset = Config.objects.all()  # Assuming you have a Library model

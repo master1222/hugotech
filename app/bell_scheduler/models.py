@@ -38,4 +38,15 @@ class Song(models.Model):
     library = models.ForeignKey(Library, on_delete=models.CASCADE, null=False)
     media = models.FileField(null=True,upload_to="libraries")
 
+class Config(models.Model):
+    country = models.CharField(max_length=2)
+    playWeekend = models.BooleanField()
+    playHoliday = models.BooleanField()
+    pin     = models.IntegerField()
+    pinBeforeSeconds = models.IntegerField()
+    trackPlaySeconds = models.IntegerField()
+    bellPlaySeconds  = models.IntegerField()
+    songPlaySeconds  = models.IntegerField()
+    
+
 
